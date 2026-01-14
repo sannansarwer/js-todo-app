@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do App</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+   
+    <div class="card text-center">
+
+        <div class="card-header">
+            <span class="badge rounded-pill bg-success">Focus List</span>
+        </div>
+
+
+        <div class="card-body">
+
+            <button id="lightMode" type="button" class="btn btn-outline-primary btn-sm">Light Mode</button>
+            <button id="darkMode" type="button" class="btn btn-outline-dark btn-sm">Dark Mode</button>
+            <br>
+            <br>
+            <div>
+
+                <div class="input-group mb-3">
+                    <input id="taskInput" type="text" class="form-control" placeholder="Add a new Task..." aria-label="add task" aria-describedby="button-addon2">
+                    <button id="addTaskBtn" class="btn btn-primary" type="button" id="button-addon2">Add</button>
+                </div>
+                <br>
+
+                <button id="filterAll" type="button" class="btn btn-outline-primary">All</button>
+                <button id="filterPending" type="button" class="btn btn-outline-secondary">Await</button>
+                <button id="filterComplete" type="button" class="btn btn-outline-success">Completed</button>
+
+            </div>
+            <br><br>
+
+            <div>
+
+                <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">No.</th>
+                            <th scope="col">Tasks</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taskTable">
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                </table>
+                <br>
+                <button id="deleteAll" type="button" class="btn btn-outline-danger">Delete All</button>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer text-muted">
+            <button type="button" class="btn btn-outline-primary">Import</button>
+            <button type="button" class="btn btn-outline-dark">Export</button>
+        </div>
+
+        
+</div>
+<script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+body{
+    margin: 120px;
+}
+
+/* --- Default Mode --- */
+body.light-mode{
+    background-color:white;
+}
+
+body.light-mode .card{
+    background-color:whitesmoke;
+}
+
+/* Table header */
+body.light-mode .table thead th {
+    background-color: rgb(83, 73, 73);
+    color: aliceblue;
+}
+
+/* Table body cells */
+body.light-mode .table > :not(caption) > * > * {
+    background-color:white;
+}
+
+/* --- Dark Mode --- */
+/* --- Dark Mode --- */
+body.dark-mode {
+    background-color: #000;
+    color: #f8f9fa;
+}
+
+/* Card styling */
+body.dark-mode .card {
+    background-color: #000;
+    border: 1px solid #444;   /* visible border */
+}
+
+/* Card header & footer */
+body.dark-mode .card-header,
+body.dark-mode .card-footer {
+    background-color: #000;
+    border-color: #444;
+    color: #f8f9fa;
+}
+
+/* Export button in dark mode */
+body.dark-mode .btn-outline-dark {
+    color: #fff;
+    border-color: #fff;
+}
+
+/* Inputs */
+body.dark-mode .form-control {
+    background-color: #3c3c3c;
+    color: #f8f9fa;
+    border-color: #4f4f4f;
+}
+/* Placeholder text */
+body.dark-mode .form-control::placeholder {
+    color: #cccccc;          /* lighter gray for placeholder */
+    opacity: 1;              /* important for some browsers */
+}
+
+/* Table header */
+body.dark-mode .table thead th {
+    background-color:#000;
+    color: rgb(235, 229, 229);
+}
+
+/* Table body cells */
+body.dark-mode .table > :not(caption) > * > * {
+    background-color:#0c0c0c;
+    border: 1px solid #444;
+    color: #cccccc;
+}
