@@ -4,7 +4,9 @@ A basic to-do list application built using vanilla JavaScript.
 
 ## Features
 - Add new tasks
-- Delete tasks
+- Edit , Completed , Delete tasks
+- Light / Dark Mode -> DOM
+- Local Storage Data
 - Simple and clean UI
 
 ## Tech Stack
