@@ -1,4 +1,4 @@
-//DOM ELEMENTS
+// ================= DOM ELEMENTS =================
 const taskInput = document.getElementById("taskInput");
 const addTaskBtn = document.getElementById("addTaskBtn");
 const taskTable = document.getElementById("taskTable");
@@ -14,7 +14,101 @@ const darkModeBtn = document.getElementById("darkMode");
 // Keep track of total tasks
 let taskCount = 0;
 
-// Function to add task
+// ================= LOCAL STORAGE =================
+function saveTasksToLocalStorage() {
+    const rows = taskTable.querySelectorAll("tr");
+    const tasks = [];
+
+    rows.forEach(row => {
+        tasks.push({
+            text: row.querySelector("td").childNodes[0].textContent.trim(),
+            status: row.dataset.status
+        });
+    });
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function loadTasksFromLocalStorage() {
+    const tasks = JSON.parse(localStorage.getItem("tasks"));
+    if (!tasks) return;
+
+    tasks.forEach(task => {
+        taskInput.value = task.text;
+        addTaskToTable();
+
+        if (task.status === "completed") {
+            const lastRow = taskTable.lastElementChild;
+            lastRow.querySelector(".doneBtn").click();
+        }
+    });
+}
+
+// ===== IMPORT / EXPORT FUNCTIONALITY =====
+
+// Select Import & Export buttons
+const importBtn = document.querySelector(".card-footer .btn-outline-primary");
+const exportBtn = document.querySelector(".card-footer .btn-outline-dark");
+const importFile = document.getElementById("importFile");
+
+// EXPORT: download tasks.json
+exportBtn.addEventListener("click", () => {
+    const data = localStorage.getItem("tasks");
+    if (!data) {
+        alert("No tasks to export!");
+        return;
+    }
+
+    const blob = new Blob([data], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "tasks.json";
+    link.click();
+});
+
+// IMPORT: load tasks from file
+importBtn.addEventListener("click", () => {
+    importFile.click();
+});
+
+importFile.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        try {
+            const importedTasks = JSON.parse(reader.result);
+
+            if (!Array.isArray(importedTasks)) throw "Invalid file";
+
+            // Clear existing tasks
+            taskTable.innerHTML = "";
+            taskCount = 0;
+
+            // Add tasks using your existing function
+            importedTasks.forEach(task => {
+                taskInput.value = task.text;
+                addTaskToTable();
+
+                if (task.status === "completed") {
+                    const lastRow = taskTable.lastElementChild;
+                    lastRow.querySelector(".doneBtn").click();
+                }
+            });
+
+            saveTasksToLocalStorage();
+            alert("Tasks imported successfully!");
+        } catch {
+            alert("Invalid JSON file!");
+        }
+    };
+
+    reader.readAsText(file);
+});
+
+
+// ================= ADD TASK =================
 const addTaskToTable = () => {
     const taskValue = taskInput.value.trim();
 
@@ -23,13 +117,9 @@ const addTaskToTable = () => {
         return;
     }
 
-    // Increment task count
     taskCount++;
 
-    // Create a new table row
     const row = document.createElement("tr");
-
-    //Default Status of Tasks
     row.dataset.status = "pending";
 
     row.innerHTML = `
@@ -42,165 +132,126 @@ const addTaskToTable = () => {
         </td>
     `;
 
-    //Task management functions
-
-    // Select buttons and task cell
     const editBtn = row.querySelector(".editBtn");
     const doneBtn = row.querySelector(".doneBtn");
     const deleteBtn = row.querySelector(".deleteBtn");
-    
-    //Edit Task functionality
+
+    // EDIT
     editBtn.addEventListener("click", () => {
         const currentTask = row.querySelector("td");
         const newTask = prompt("Update Your Task", currentTask.textContent);
-            if (newTask !== null && newTask.trim() !== "") {
-                currentTask.textContent = newTask.trim();
-            }
+
+        if (newTask !== null && newTask.trim() !== "") {
+            currentTask.textContent = newTask.trim();
+            saveTasksToLocalStorage();
+        }
     });
 
-    //Completed Task functionality
+    // DONE
     doneBtn.addEventListener("click", () => {
         const currentTask = row.querySelector("td");
-
-        // Apply strikethrough
         currentTask.style.textDecoration = "line-through";
 
-        // Add tick badge
         const tickBadge = document.createElement("span");
-        tickBadge.className = "badge bg-success ms-2"; // small green badge
+        tickBadge.className = "badge bg-success ms-2";
         tickBadge.textContent = "✓";
         currentTask.appendChild(tickBadge);
 
-        //Status of Completed Tasks
         row.dataset.status = "completed";
 
-        // Disable Done & Edit buttons to prevent re-click
         doneBtn.disabled = true;
         editBtn.disabled = true;
+
+        saveTasksToLocalStorage();
     });
 
-    //Delete Task functionality
+    // DELETE
     deleteBtn.addEventListener("click", () => {
-        row.remove(); // remove row
+        row.remove();
 
-        // Recalculate numbers
         const rows = taskTable.querySelectorAll("tr");
         rows.forEach((r, index) => {
             r.querySelector("th").textContent = index + 1;
         });
 
         taskCount = rows.length;
+        saveTasksToLocalStorage();
     });
 
-    // Append row to table
     taskTable.appendChild(row);
-
-    // Clear input
     taskInput.value = "";
+
+    saveTasksToLocalStorage();
 };
 
-//Add Button Events 
-
-// Button click
+// ================= ADD BUTTON EVENTS =================
 addTaskBtn.addEventListener("click", addTaskToTable);
 
-// Enter key
 taskInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") addTaskToTable();
 });
 
-//Delete All Task functionality
-deleteAll.addEventListener( "click" , () => {
-
-    // Check if there are no tasks
+// ================= DELETE ALL =================
+deleteAll.addEventListener("click", () => {
     if (taskTable.rows.length === 0) {
         alert("There are no tasks available to delete!");
         return;
     }
 
-    // Confirmation
     if (!confirm("Are you sure you want to delete all tasks?")) return;
 
-    // Remove all rows from tbody
     taskTable.innerHTML = "";
-
-    // Reset task count
     taskCount = 0;
- 
+    localStorage.removeItem("tasks");
 });
 
-//Filter functionalities
-
-//Active Filter Function
+// ================= FILTERS =================
 const filterButtons = [filterAll, filterPending, filterComplete];
-function setActiveFilter(activeButton) {
-    filterButtons.forEach(btn => {
-        btn.classList.remove("active");
-    });
 
+function setActiveFilter(activeButton) {
+    filterButtons.forEach(btn => btn.classList.remove("active"));
     activeButton.classList.add("active");
 }
 
-//ALL Section
 filterAll.addEventListener("click", () => {
     setActiveFilter(filterAll);
-    const rows = taskTable.querySelectorAll("tr");
-
-    rows.forEach(row => {
-        row.style.display = "";
-    });
+    taskTable.querySelectorAll("tr").forEach(row => row.style.display = "");
 });
 
-//Await Section
 filterPending.addEventListener("click", () => {
     setActiveFilter(filterPending);
-    const rows = taskTable.querySelectorAll("tr");
-
-    rows.forEach(row => {
-        if (row.dataset.status === "pending") {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
+    taskTable.querySelectorAll("tr").forEach(row => {
+        row.style.display = row.dataset.status === "pending" ? "" : "none";
     });
 });
 
-//Completed Section
 filterComplete.addEventListener("click", () => {
     setActiveFilter(filterComplete);
-    const rows = taskTable.querySelectorAll("tr");
-
-    rows.forEach(row => {
-        if (row.dataset.status === "completed") {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
+    taskTable.querySelectorAll("tr").forEach(row => {
+        row.style.display = row.dataset.status === "completed" ? "" : "none";
     });
 });
 
-//Modes Functionalities
-
-//Default Mode
+// ================= MODES =================
 document.body.classList.add("light-mode");
 lightModeBtn.classList.add("active");
 
 const setMode = (mode) => {
-    document.body.classList.remove( "light-mode" , "dark-mode" );
-    if ( mode === "light" ){
+    document.body.classList.remove("light-mode", "dark-mode");
 
+    if (mode === "light") {
         document.body.classList.add("light-mode");
         lightModeBtn.classList.add("active");
         darkModeBtn.classList.remove("active");
-
     } else {
-        
         document.body.classList.add("dark-mode");
         darkModeBtn.classList.add("active");
         lightModeBtn.classList.remove("active");
     }
 };
 
-//Mode Click Event
-lightModeBtn.addEventListener("click", () => setMode ("light") );
-darkModeBtn.addEventListener("click", () => setMode ("dark") );
+lightModeBtn.addEventListener("click", () => setMode("light"));
+darkModeBtn.addEventListener("click", () => setMode("dark"));
+
+// ================= LOAD SAVED TASKS =================
+loadTasksFromLocalStorage();
