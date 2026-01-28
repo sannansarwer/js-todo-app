@@ -17,6 +17,15 @@ body.light-mode .card{
     background-color:whitesmoke;
 }
 
+/* Table  */
+@media (max-width: 576px) {
+    table th:first-child,
+    table td:first-child {
+        display: none;
+    }
+}
+
+
 /* Table header */
 body.light-mode .table thead th {
     background-color: rgb(83, 73, 73);
@@ -79,4 +88,19 @@ body.dark-mode .table > :not(caption) > * > * {
     border: 1px solid #444;
     color: #cccccc;
 
+}
+
+@media (max-width: 576px) {
+    .card {
+        border-radius: 10px;
+    }
+
+    .card-header,
+    .card-footer {
+        font-size: 0.9rem;
+    }
+
+    h1, h2, h3 {
+        font-size: 1.2rem;
+    }
 }
